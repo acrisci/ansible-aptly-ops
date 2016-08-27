@@ -1,0 +1,9 @@
+aptly_secret_key_id: <SECRET_ID>
+
+aptly_repositories:
+    -
+        name: yourcompany-dev
+        comment: Developent packages
+        distribution: trusty
+        component: main
+        architectures: amd64,i386

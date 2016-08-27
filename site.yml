@@ -1,0 +1,13 @@
+---
+- name: Install repo servers
+  hosts: repo-server
+  remote_user: tony
+  sudo: yes
+
+  roles:
+    - aptly-repo
+
+  vars_prompt:
+    - name: "aptly_gpg_passphrase"
+      prompt: "Enter GPG passphrase (possibly insecure)"
+      private: yes
