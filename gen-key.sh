@@ -3,9 +3,11 @@
 # A hacky script to generate a gpg key and include it in the project
 # ** NOT FOR PRODUCTION USE **
 
+set -e
+
 cd "$(dirname "$0")"
 
-HAVEGED=`command -v haveged`
+HAVEGED=`command -v haveged || true`
 
 if [ x$HAVEGED != x ]; then
     echo "starting haveged service (requires root)"
