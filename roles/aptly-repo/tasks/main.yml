@@ -75,9 +75,14 @@
     file: path=/tmp/ansible-aptly-run state=absent
     become: yes
 -
+    name: Create package tmpdirs
+    file: path=/tmp/ansible-aptly-run/debs state=directory
+-
     name: Upload packages
-    copy: src=debs dest=/tmp/ansible-aptly-run
+    copy: src={{ item }} dest=/tmp/ansible-aptly-run/debs
     become: yes
+    with_items: "{{ aptly_debs }}"
+    when: aptly_debs is defined
 -
     name: Import packages to repository
     command: bash -c "aptly repo add {{ item.name }} /tmp/ansible-aptly-run/debs/*"
