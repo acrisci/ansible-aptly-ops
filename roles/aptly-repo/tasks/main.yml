@@ -41,6 +41,24 @@
         state: absent
     become: yes
 -
+    name: Unpublish old repository if it exists
+    command: aptly publish drop {{ item.distribution }} {{ item.name }}
+    # it will error when the repository does not exist
+    ignore_errors: True
+    become: yes
+    become_user: "{{ aptly_user }}"
+    with_items: "{{ aptly_repositories }}"
+    when: aptly_repositories is defined
+-
+    name: Drop old repository if it exists
+    command: aptly repo drop {{ item.name }}
+    # it will error when repository does not exist
+    ignore_errors: True
+    become: yes
+    become_user: "{{ aptly_user }}"
+    with_items: "{{ aptly_repositories }}"
+    when: aptly_repositories is defined
+-
     name: Create repositories
     shell: >
         (aptly repo list -raw | grep -q "{{ item.name }}" )
@@ -57,15 +75,15 @@
     when: aptly_repositories is defined
 -
     name: Clean up package tmpdir
-    file: path=/tmp/aptly-debs state=absent
+    file: path=/tmp/ansible-aptly-run state=absent
     become: yes
 -
     name: Upload packages
-    copy: src=aptly-debs dest=/tmp/
+    copy: src=debs dest=/tmp/ansible-aptly-run
     become: yes
 -
     name: Import packages to repository
-    command: bash -c "aptly repo add {{ item.name }} /tmp/aptly-debs/*"
+    command: bash -c "aptly repo add {{ item.name }} /tmp/ansible-aptly-run/debs/*"
     become: yes
     become_user: "{{ aptly_user }}"
     with_items: "{{ aptly_repositories }}"
