@@ -2,7 +2,7 @@
 - name: Install repo servers
   hosts: repo-server
   remote_user: tony
-  sudo: yes
+  become: yes
 
   roles:
     - aptly-repo

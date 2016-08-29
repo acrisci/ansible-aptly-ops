@@ -47,7 +47,7 @@
         )
     become: yes
     become_user: "{{ aptly_user }}"
-    with_items: aptly_repositories
+    with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
     name: Upload dummy package
@@ -58,7 +58,7 @@
     command: aptly repo add {{ item.name }} /tmp/dummy_0.1_all.deb
     become: yes
     become_user: "{{ aptly_user }}"
-    with_items: aptly_repositories
+    with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
     name: Publish repositories
@@ -74,7 +74,7 @@
             (?i)passphrase: "{{ aptly_gpg_passphrase }}"
     become: yes
     become_user: "{{ aptly_user }}"
-    with_items: aptly_repositories
+    with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
     name: remove nginx 'it works' page
