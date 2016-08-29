@@ -56,12 +56,16 @@
     with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
-    name: Upload dummy package
-    copy: src=dummy_0.1_all.deb dest=/tmp/
+    name: Clean up package tmpdir
+    file: path=/tmp/aptly-debs state=absent
     become: yes
 -
-    name: Import dummy package to repository
-    command: aptly repo add {{ item.name }} /tmp/dummy_0.1_all.deb
+    name: Upload packages
+    copy: src=aptly-debs dest=/tmp/
+    become: yes
+-
+    name: Import packages to repository
+    command: bash -c "aptly repo add {{ item.name }} /tmp/aptly-debs/*"
     become: yes
     become_user: "{{ aptly_user }}"
     with_items: "{{ aptly_repositories }}"
