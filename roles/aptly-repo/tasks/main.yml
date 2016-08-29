@@ -1,5 +1,5 @@
 -
-    name: Creating user repo
+    name: Create user repo
     user: name={{ aptly_user }} shell=/bin/bash
     become: yes
 -
@@ -21,7 +21,11 @@
     become: yes
 -
     name: Upload repository key
-    copy: src="{{ aptly_secret_key_path }}/{{ aptly_secret_key_file }}" dest=/tmp owner={{ aptly_user }} group={{ aptly_user }} mode=0400
+    copy:
+        src: "{{ aptly_secret_key_path }}/{{ aptly_secret_key_file }}"
+        dest: /tmp owner={{ aptly_user }}
+        group: "{{ aptly_user }}"
+        mode: 0400
     become: yes
 -
     name: Import repository key to gnupg
@@ -31,8 +35,10 @@
     become: yes
     become_user: "{{ aptly_user }}"
 -
-    name: Remove secret key from repote host
-    file: path="/tmp/{{ aptly_secret_key_file }}" state=absent
+    name: Remove secret key from remote host
+    file:
+        path: "/tmp/{{ aptly_secret_key_file }}"
+        state: absent
     become: yes
 -
     name: Create repositories
@@ -77,7 +83,7 @@
     with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
-    name: remove nginx 'it works' page
+    name: Remove nginx 'it works' page
     file: path=/etc/nginx/sites-enabled/default state=absent
     become: yes
 -
@@ -86,7 +92,7 @@
     notify: restart nginx
     become: yes
 -
-    name: Creating nginx configuration symlinks
+    name: Create nginx configuration symlinks
     file: src=/etc/nginx/sites-available/aptly.conf dest=/etc/nginx/sites-enabled/aptly.conf state=link
     notify: restart nginx
     become: yes
