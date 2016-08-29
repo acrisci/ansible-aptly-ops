@@ -61,14 +61,11 @@
 -
     name: Create repositories
     shell: >
-        (aptly repo list -raw | grep -q "{{ item.name }}" )
-        || (
-            aptly repo create \
-                --comment "{{ item.comment|default('\"\"') }}" \
-                --distribution "{{ item.distribution|default('main') }}" \
-                --component "{{ item.component|default('main') }}" \
-                "{{ item.name }}"
-        )
+        aptly repo create \
+            --comment "{{ item.comment|default('\"\"') }}" \
+            --distribution "{{ item.distribution|default('main') }}" \
+            --component "{{ item.component|default('main') }}" \
+            "{{ item.name }}"
     become: yes
     become_user: "{{ aptly_user }}"
     with_items: "{{ aptly_repositories }}"
@@ -92,12 +89,11 @@
     name: Publish repositories
     expect:
         command: >
-            bash -c '(aptly publish list | grep -q "{{ item.name }}")
-            || aptly publish repo \
-                --gpg-key "{{ aptly_secret_key_id }}" \
-                --architectures "{{ item.architectures|default('amd64,i386') }}" \
-                "{{ item.name }}" \
-                "{{ item.prefix|default(item.name) }}"'
+            aptly publish repo
+              --gpg-key "{{ aptly_secret_key_id }}"
+              --architectures "{{ item.architectures|default('amd64,i386') }}"
+              "{{ item.name }}"
+              "{{ item.prefix|default(item.name) }}"
         responses:
             (?i)passphrase: "{{ aptly_gpg_passphrase }}"
     become: yes
