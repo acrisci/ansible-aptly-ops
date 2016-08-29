@@ -34,4 +34,5 @@ perl -pi -e "s/^aptly_secret_key_id:.*/aptly_secret_key_id: $KEY/g" group_vars/a
 
 if [ x$HAVEGED != x ]; then
     echo "stopping havaged service (requires root)"
+    sudo systemctl stop haveged
 fi
