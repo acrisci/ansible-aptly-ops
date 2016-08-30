@@ -1,0 +1,37 @@
+---
+- hosts: repo-server
+  remote_user: tony
+  tasks:
+    - name: Clean up package tmpdir
+      file: path=/tmp/ansible-aptly-run state=absent
+      become: yes
+    - name: Create package tmpdirs
+      file: path=/tmp/ansible-aptly-run/debs state=directory
+    - name: Upload packages
+      copy: src={{ item }} dest=/tmp/ansible-aptly-run/debs
+      become: yes
+      with_items: "{{ aptly_debs }}"
+      when: aptly_debs is defined
+    - name: Import packages to repository
+      command: aptly repo add {{ item.name }} /tmp/ansible-aptly-run/debs
+      become: yes
+      become_user: "{{ aptly_user }}"
+      with_items: "{{ aptly_repositories }}"
+      when: aptly_repositories is defined
+    - name: Update the repository
+      expect:
+        command: aptly publish update {{ item.distribution }} {{ item.name }}
+        responses:
+          (?i)passphrase: "{{ aptly_gpg_passphrase }}"
+      become: yes
+      become_user: "{{ aptly_user }}"
+      with_items: "{{ aptly_repositories }}"
+      when: aptly_repositories is defined
+    - name: Clean up package tmpdir
+      file: path=/tmp/ansible-aptly-run state=absent
+      become: yes
+
+  vars_prompt:
+    - name: "aptly_gpg_passphrase"
+      prompt: "Enter GPG passphrase (possibly insecure)"
+      private: yes
