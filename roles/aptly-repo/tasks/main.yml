@@ -21,11 +21,7 @@
     become: yes
 -
     name: Upload repository key
-    copy:
-        src: "{{ aptly_secret_key_path }}/{{ aptly_secret_key_file }}"
-        dest: /tmp owner={{ aptly_user }}
-        group: "{{ aptly_user }}"
-        mode: 0400
+    copy: src="{{ aptly_secret_key_path }}/{{ aptly_secret_key_file }}" dest=/tmp owner={{ aptly_user }} group="{{ aptly_user }}" mode=0400
     become: yes
 -
     name: Import repository key to gnupg
