@@ -73,6 +73,23 @@ ansible-playbook -i hosts --ask-become-pass site.yml
 
 This step will drop and recreate the repos so they only include the given Debian packages.
 
+#### Using on the Client
+
+First add your public key to trusted apt keys.
+
+```
+sudo apt-key add secrets/aptly/public.key
+```
+
+Then add an entry in your sources.list config directory.
+
+```
+# in file /etc/apt/sources.list.d/yourcompany-dev.list
+deb http://[HOST]/yourcompany-dev trusty main
+```
+
+Now update apt with `sudo apt-get update` and your packages should be available to install.
+
 ## Todo
 
 * better key management with vault
