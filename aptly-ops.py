@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 from os import path
 from argparse import ArgumentParser
 from subprocess import call
 import json
+
+script_dir = os.path.dirname(path.realpath(__file__))
 
 PUBLISH_REPOS = 'publish-repos'
 UPDATE_REPOS = 'update-repos'
@@ -17,9 +20,9 @@ def run_playbook(playbook, debs=[]):
             print('Could not find package: %s' % d)
             sys.exit(1)
 
-        extra_vars['aptly_debs'].append(d)
+        extra_vars['aptly_debs'].append(path.realpath(d))
 
-    call(['ansible-playbook', '-i', 'hosts', '--ask-become-pass', '--extra-vars', json.dumps(extra_vars), playbook])
+    call(['ansible-playbook', '-i', path.join(script_dir, 'hosts'), '--ask-become-pass', '--extra-vars', json.dumps(extra_vars), path.join(script_dir, playbook)])
 
 def do_publish_repos(args):
     run_playbook('site.yml', debs=args.debs)
