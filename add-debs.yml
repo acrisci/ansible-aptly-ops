@@ -13,14 +13,16 @@
       with_items: "{{ aptly_debs }}"
       when: aptly_debs is defined
     - name: Import packages to repository
-      command: aptly repo add {{ item.name }} /tmp/ansible-aptly-run/debs
+        # XXX what are the consequences of forcing replacement when the packages are different?
+      command: aptly repo add -force-replace=true {{ item.name }} /tmp/ansible-aptly-run/debs
       become: yes
       become_user: "{{ aptly_user }}"
       with_items: "{{ aptly_repositories }}"
       when: aptly_repositories is defined
     - name: Update the repository
       expect:
-        command: aptly publish update {{ item.distribution }} {{ item.name }}
+        # XXX what are the consequences of forcing an overwrite when the packages are different?
+        command: aptly publish update -force-overwrite=true {{ item.distribution }} {{ item.name }}
         responses:
           (?i)passphrase: "{{ aptly_gpg_passphrase }}"
       become: yes
