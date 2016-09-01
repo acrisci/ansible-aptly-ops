@@ -1,5 +1,5 @@
 ---
-- name: Install repo servers
+- name: Create repo servers
   hosts: repo-server
   remote_user: tony
   become: yes

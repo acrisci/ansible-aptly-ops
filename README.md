@@ -59,19 +59,20 @@ To create a new keypair for development and do all the above steps automatically
 
 #### Publish Repository
 
-The `aptly-ops.py` script can publish a list of Debian packages from the command line. Use the `publish-repos` command and give a list of Debian packages to publish to the repo.
+The `aptly-ops.py` script can publish a repository the command line. Use the `create-repos` command to publish the configured repositories.
 
 ```
-./aptly-ops.py publish-repos ./dummy_0.1_all.deb
+./aptly-ops.py create-repos
 ```
 
-Alternatively, you can run the Ansible playbook yourself by adding the Debian packages to the `aptly_debs` var in `site.yml`.
+#### Add Debian Packages
+
+Now use the `aptly-ops.py` to add Debian packages to your configured repositories.
 
 ```
-ansible-playbook -i hosts --ask-become-pass site.yml
+./aptly-ops.py add-debs ./dummy_0.1_all.deb
 ```
 
-This step will drop and recreate the repos so they only include the given Debian packages.
 
 #### Using on the Client
 

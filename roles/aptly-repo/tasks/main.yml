@@ -1,5 +1,5 @@
 -
-    name: Create user repo
+    name: Create aptly user
     user: name={{ aptly_user }} shell=/bin/bash
     become: yes
 -
@@ -37,26 +37,9 @@
         state: absent
     become: yes
 -
-    name: Unpublish old repository if it exists
-    command: aptly publish drop {{ item.distribution }} {{ item.name }}
-    # it will error when the repository does not exist
-    ignore_errors: True
-    become: yes
-    become_user: "{{ aptly_user }}"
-    with_items: "{{ aptly_repositories }}"
-    when: aptly_repositories is defined
--
-    name: Drop old repository if it exists
-    command: aptly repo drop {{ item.name }}
-    # it will error when repository does not exist
-    ignore_errors: True
-    become: yes
-    become_user: "{{ aptly_user }}"
-    with_items: "{{ aptly_repositories }}"
-    when: aptly_repositories is defined
--
     name: Create repositories
     shell: >
+        (aptly repo list -raw | grep -q "^{{ item.name }}$" ) ||
         aptly repo create \
             --comment "{{ item.comment|default('\"\"') }}" \
             --distribution "{{ item.distribution|default('main') }}" \
@@ -67,34 +50,15 @@
     with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
 -
-    name: Clean up package tmpdir
-    file: path=/tmp/ansible-aptly-run state=absent
-    become: yes
--
-    name: Create package tmpdirs
-    file: path=/tmp/ansible-aptly-run/debs state=directory
--
-    name: Upload packages
-    copy: src={{ item }} dest=/tmp/ansible-aptly-run/debs
-    become: yes
-    with_items: "{{ aptly_debs }}"
-    when: aptly_debs is defined
--
-    name: Import packages to repository
-    command: bash -c "aptly repo add {{ item.name }} /tmp/ansible-aptly-run/debs/*"
-    become: yes
-    become_user: "{{ aptly_user }}"
-    with_items: "{{ aptly_repositories }}"
-    when: aptly_repositories is defined
--
     name: Publish repositories
     expect:
         command: >
-            aptly publish repo
-              --gpg-key "{{ aptly_secret_key_id }}"
-              --architectures "{{ item.architectures|default('amd64,i386') }}"
-              "{{ item.name }}"
-              "{{ item.prefix|default(item.name) }}"
+          bash -c "(aptly publish list -raw | awk '{ print $1; }' | grep -q '^{{ item.name }}$') ||
+            aptly publish repo \
+              --gpg-key '{{ aptly_secret_key_id }}' \
+              --architectures '{{ item.architectures|default('amd64,i386') }}' \
+              '{{ item.name }}' \
+              '{{ item.prefix|default(item.name) }}'"
         responses:
             (?i)passphrase: "{{ aptly_gpg_passphrase }}"
     become: yes
