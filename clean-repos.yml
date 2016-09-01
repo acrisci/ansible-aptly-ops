@@ -1,0 +1,20 @@
+---
+- hosts: repo-server
+  remote_user: tony
+  tasks:
+    - name: Unpublish old repository if it exists
+      command: aptly publish drop {{ item.distribution }} {{ item.name }}
+      # it will error when the repository does not exist
+      ignore_errors: True
+      become: yes
+      become_user: "{{ aptly_user }}"
+      with_items: "{{ aptly_repositories }}"
+      when: aptly_repositories is defined
+    - name: Drop old repository if it exists
+      command: aptly repo drop {{ item.name }}
+      # it will error when repository does not exist
+      ignore_errors: True
+      become: yes
+      become_user: "{{ aptly_user }}"
+      with_items: "{{ aptly_repositories }}"
+      when: aptly_repositories is defined

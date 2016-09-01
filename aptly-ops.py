@@ -11,6 +11,7 @@ script_dir = os.path.dirname(path.realpath(__file__))
 
 PUBLISH_REPOS = 'publish-repos'
 UPDATE_REPOS = 'update-repos'
+CLEAN_REPOS = 'clean-repos'
 
 def run_playbook(playbook, debs=[]):
     extra_vars = { 'aptly_debs': [] }
@@ -23,6 +24,9 @@ def run_playbook(playbook, debs=[]):
         extra_vars['aptly_debs'].append(path.realpath(d))
 
     call(['ansible-playbook', '-i', path.join(script_dir, 'hosts'), '--ask-become-pass', '--extra-vars', json.dumps(extra_vars), path.join(script_dir, playbook)])
+
+def do_clean_repos(args):
+    run_playbook('clean-repos.yml')
 
 def do_publish_repos(args):
     run_playbook('site.yml', debs=args.debs)
@@ -40,6 +44,8 @@ publish_repos_cmd.add_argument('debs', metavar='DEBS', nargs='+', help='The Debi
 update_repos_cmd = subparsers.add_parser(UPDATE_REPOS)
 update_repos_cmd.add_argument('debs', metavar='DEBS', nargs='+', help='The Debian packages to update the repo with')
 
+clean_repos_cmd = subparsers.add_parser(CLEAN_REPOS)
+
 args = parser.parse_args()
 
 if not args.command:
@@ -50,3 +56,5 @@ if args.command == PUBLISH_REPOS:
     do_publish_repos(args)
 elif args.command == UPDATE_REPOS:
     do_update_repos(args)
+elif args.command == CLEAN_REPOS:
+    do_clean_repos(args)
