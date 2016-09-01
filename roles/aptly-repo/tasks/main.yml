@@ -23,6 +23,7 @@
     name: Upload repository key
     copy: src="{{ aptly_secret_key_path }}/{{ aptly_secret_key_file }}" dest=/tmp owner={{ aptly_user }} group="{{ aptly_user }}" mode=0400
     become: yes
+    changed_when: False
 -
     name: Import repository key to gnupg
     shell: >
@@ -30,12 +31,15 @@
         || gpg --allow-secret-key-import --import /tmp/{{ aptly_secret_key_file }}
     become: yes
     become_user: "{{ aptly_user }}"
+    register: command_result
+    changed_when: "command_result.stdout != ''"
 -
     name: Remove secret key from remote host
     file:
         path: "/tmp/{{ aptly_secret_key_file }}"
         state: absent
     become: yes
+    changed_when: False
 -
     name: Create repositories
     shell: >
@@ -49,6 +53,8 @@
     become_user: "{{ aptly_user }}"
     with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
+    register: command_result
+    changed_when: "command_result.stdout != ''"
 -
     name: Publish repositories
     expect:
@@ -65,6 +71,8 @@
     become_user: "{{ aptly_user }}"
     with_items: "{{ aptly_repositories }}"
     when: aptly_repositories is defined
+    register: command_result
+    changed_when: "command_result.stdout != ''"
 -
     name: Remove nginx 'it works' page
     file: path=/etc/nginx/sites-enabled/default state=absent
