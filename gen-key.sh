@@ -27,6 +27,8 @@ mkdir -p secrets/aptly
 gpg --export-secret-keys --armor $KEY > secrets/aptly/private.key
 gpg --export --armor $KEY > secrets/aptly/public.key
 
+ansible-vault encrypt secrets/aptly/private.key
+
 # XXX very hacky way to setting this variable
 # TODO dynamically get this variable within the ansible role with `gpg $KEY` to
 # get info

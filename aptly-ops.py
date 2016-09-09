@@ -23,7 +23,12 @@ def run_playbook(playbook, debs=[]):
 
         extra_vars['aptly_debs'].append(path.realpath(d))
 
-    call(['ansible-playbook', '-i', path.join(script_dir, 'hosts'), '--ask-become-pass', '--extra-vars', json.dumps(extra_vars), path.join(script_dir, playbook)])
+    cmd = ['ansible-playbook', '-i', path.join(script_dir, 'hosts'), '--ask-become-pass', '--extra-vars', json.dumps(extra_vars), path.join(script_dir, playbook)]
+
+    if 'ANSIBLE_VAULT_PASSWORD_FILE'not in os.environ:
+        cmd += ['--ask-vault-pass']
+
+    call(cmd)
 
 def do_clean_repos(args):
     run_playbook('clean-repos.yml')
