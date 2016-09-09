@@ -1,5 +1,6 @@
 -
     name: Create aptly user
+    # TODO disable login shell for aptly user
     user: name={{ aptly_user }} shell=/bin/bash
     become: yes
 -
@@ -11,12 +12,11 @@
     apt_key: id=9E3E53F19C7DE460 keyserver=keys.gnupg.net state=present
     become: yes
 -
-    name: Install GPG and nginx
+    name: Install GPG
     apt: name={{ item }} state=present update_cache=yes
     with_items:
         - aptly
         - gnupg
-        - nginx
         - python-pexpect
     become: yes
 -
@@ -73,17 +73,3 @@
     when: aptly_repositories is defined
     register: command_result
     changed_when: "command_result.stdout != ''"
--
-    name: Remove nginx 'it works' page
-    file: path=/etc/nginx/sites-enabled/default state=absent
-    become: yes
--
-    name: Upload nginx configuration file
-    template: src=nginx-aptly.conf.j2 dest=/etc/nginx/sites-available/aptly.conf owner=root group=root mode=644
-    notify: restart nginx
-    become: yes
--
-    name: Create nginx configuration symlinks
-    file: src=/etc/nginx/sites-available/aptly.conf dest=/etc/nginx/sites-enabled/aptly.conf state=link
-    notify: restart nginx
-    become: yes

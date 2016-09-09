@@ -6,6 +6,7 @@
 
   roles:
     - aptly-repo
+    - aptly-nginx
 
   vars_prompt:
     - name: "aptly_gpg_passphrase"
