@@ -1,7 +1,5 @@
 # Ansible Aptly Ops
 
-**Work in progress**
-
 Scripts to manage Debian repos and mirrors created with [Aptly](https://www.aptly.info/).
 
 This project is based on the [ansible-aptly-role](https://github.com/alexey-sveshnikov/ansible-aptly-role) but as a standalone project with greater scope.
@@ -93,11 +91,7 @@ Now update apt with `sudo apt-get update` and your packages should be available 
 
 ## Todo
 
-* better key management with vault
 * mirrors
-* replication
-* command line utility
-* nginx access controls
 
 ## License
 
